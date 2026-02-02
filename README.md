@@ -1,6 +1,6 @@
 # 🌐 VLM4ST: A Vision-Language Foundation Model for Spatiotemporal Prediction
 
-A novel Vision-Language Model (VLM)-based framework for spatiotemporal prediction tasks, combining multi-scale disentangled attention mechanisms with pre-trained vision-language encoders (ALBEF) and parameter-efficient LoRA fine-tuning.
+A novel Vision-Language Model (VLM)-based framework for spatiotemporal prediction tasks, combining multi-scale disentangled attention mechanisms with pre-trained vision-language encoders (ALBEF).
 
 ## 📁 Project Structure
 
@@ -287,7 +287,7 @@ model:
     lora_type: "standard"      # Basic LoRA
     # lora_type: "mtl"         # Multi-Task LoRA with task-specific parameters
     # lora_type: "moe"         # Mixture of Experts LoRA
-    # lora_type: "task_adaptive"  # Task-Adaptive LoRA (our proposed)
+    # lora_type: "task_adaptive"  # Task-Adaptive LoRA
     lora_rank: 16
     lora_alpha: 32
     num_tasks: 14              # For mtl/task_adaptive
