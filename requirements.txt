@@ -1,0 +1,13 @@
+python 3.10
+transformers 4.8.1
+timm
+torch
+torchvision
+numpy
+pyyaml
+tensorboard
+tqdm
+einops
+scikit-learn
+matplotlib
+

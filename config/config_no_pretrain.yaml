@@ -1,0 +1,115 @@
+# VLM4ST Configuration File - No Pretrained Weights (Ablation Study)
+# 
+# Purpose: Test model performance without loading ALBEF pretrained parameters
+# This ablation study verifies the contribution of pretrained VLM knowledge
+#
+# Key differences from config.yaml:
+#   - pretrained_path: null (no pretrained weights)
+#   - use_lora: false (LoRA is meaningless without pretrained weights)
+#   - Backbone will be trained from scratch (not frozen)
+
+# Data Configuration
+data:
+  dataset_path: "./Dataset/dataset1.json"
+  dataset_paths:
+    - "./Dataset/dataset1.json"
+    - "./Dataset/dataset2.json"
+    # ... more datasets
+  task: "prediction"
+  normalize: true
+  train_ratio: 0.7
+  val_ratio: 0.15
+  test_ratio: 0.15
+
+# Model Architecture Configuration
+model:
+  # Input dimensions
+  T: 6  # Temporal length for input (T_in)
+  T_out: 6  # Temporal length for output/prediction (T_out)
+  H: 32  # Spatial height
+  W: 32  # Spatial width
+  d_model: 256  # Feature dimension
+  
+  # DiX-Attention
+  dix_attention:
+    num_heads: 8
+    num_layers: 2
+    dropout: 0.1
+  
+  # PromptForge
+  prompt_forge:
+    num_coarse_prototypes: 5
+    num_fine_per_coarse: 2
+    d_prompt: 128  # Prompt dimension per modality (temporal/spatial/cross)
+  
+  # Gate Fusion
+  gate_fusion:
+    num_branches: 4  # temporal, spatial, cross, input
+  
+  # Format Transformer
+  format_transformer:
+    spatial_pool_size: 10
+    num_latents: 300
+    vlm_hidden_dim: 768
+  
+  # VLM (ALBEF) - NO PRETRAINED WEIGHTS
+  vlm:
+    image_res: 224
+    embed_dim: 256
+    vision_width: 768
+    bert_config: "./config/config_bert.json"
+    # === Key ablation settings ===
+    pretrained_path: null  # Do NOT load ALBEF pretrained weights
+    use_lora: false        # LoRA is meaningless without pretrained weights
+    # Note: Without pretrained weights and LoRA, the backbone will be trained from scratch
+    # LoRA parameters below are ignored when use_lora=false, kept for reference
+    lora_type: "standard"
+    lora_rank: 16
+    lora_alpha: 32
+    num_tasks: 14
+    num_experts: 4
+    task_emb_dim: 32
+  
+  # Prediction Head
+  prediction_head:
+    hidden_dim: 512
+    output_channels: 1  # Single channel output
+
+# Training Configuration
+training:
+  batch_size: 32
+  num_epochs: 65
+  learning_rate: 1.0e-4
+  weight_decay: 0.05
+  warmup_epochs: 5
+  
+  # Loss weights
+  loss:
+    mse_weight: 1.0          # Prediction loss (MSE)
+    mae_weight: 0.5          # Prediction loss (MAE)
+  
+  # Optimizer
+  optimizer: "adamw"
+  scheduler: "cosine"
+  
+  # Device
+  device: "cuda"
+  num_workers: 4
+  
+  # Checkpoint
+  save_dir: "./checkpoints/no_pretrain"  # Separate checkpoint directory
+  log_dir: "./logs"
+  save_frequency: 5
+
+# Testing Configuration
+testing:
+  checkpoint_path: "./checkpoints/no_pretrain/best_model.pth"
+  batch_size: 32
+  output_dir: "./results/no_pretrain"
+
+# Few-shot/Zero-shot Configuration
+few_shot:
+  target_ratio: 0.0  # 0.0 for zero-shot, 0.05 for 5%, 0.1 for 10%, etc.
+  num_epochs: 100    # Fewer epochs for few-shot training
+  save_dir: "./checkpoints/few_shot/no_pretrain"
+  output_dir: "./results/few_shot/no_pretrain"
